@@ -11,12 +11,11 @@ public class TokenResponse {
 
     private String token;
     private String tipo = "Bearer";
-    private String email;
     private String rol;
+    private String mensaje = "Inicio de sesión exitoso";
 
-    public TokenResponse(String token, String email, String rol) {
+    public TokenResponse(String token, String rol) {
         this.token = token;
-        this.email = email;
         this.rol = rol;
     }
 

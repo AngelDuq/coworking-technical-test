@@ -42,6 +42,6 @@ public class AuthController {
                 .findFirst()
                 .orElse("ROLE_USER");
 
-        return ResponseEntity.ok(new TokenResponse(token, loginRequest.getEmail(), rol));
+        return ResponseEntity.ok(new TokenResponse(token, rol));
     }
 }

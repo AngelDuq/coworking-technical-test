@@ -10,6 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,22 +23,33 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "sede")
 public class Sede {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
+    @Column(length = 100, nullable = false)
     private String nombre;
 
+    @NotBlank
+    @Column(length = 200, nullable = false)
     private String direccion;
 
-    @Column(name = "capacidad_max_simultanea")
+    @NotNull
+    @Positive
+    @Column(name = "capacidad_max_simultanea", nullable = false)
     private Integer capacidadMaxSimultanea;
 
-    @Column(name = "precio_hora")
+    @NotNull
+    @Positive
+    @Column(name = "precio_hora", precision = 10, scale = 2, nullable = false)
     private BigDecimal precioHora;
 
+    /**
+     * Operador (Usuario con rol OPERADOR) asignado a esta sede.
+     */
     @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @JoinColumn(name = "operador_id")
+    private Usuario operador;
 }

@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS usuario (
     CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES rol(id)
 );
 
+
 -- ================================
 -- Datos iniciales: rol
 -- ================================
