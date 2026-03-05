@@ -247,6 +247,12 @@ Al iniciar la aplicación, se crean automáticamente:
 
 ---
 
+## Modelo Entidad-Relación
+
+![Modelo Entidad-Relación Coworking](MODELO%20ENTIDAD%20RELACION%20COWORKING.jpeg)
+
+---
+
 ## Estructura del proyecto
 
 ```

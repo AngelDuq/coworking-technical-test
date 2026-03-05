@@ -436,7 +436,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 
 ## 5. Ingresos
 
-> **Acceso:** Requiere rol **OPERADOR**
+> **Acceso:** Rol **OPERADOR** para registrar ingresos y consultar su sede. Rol **ADMIN** para consultar accesos en todas las sedes.
 
 ### POST `/api/ingresos` — Registrar ingreso de persona
 
@@ -469,6 +469,61 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 - `400` — La persona ya tiene un ingreso activo en una sede
 - `400` — La sede ha alcanzado su capacidad máxima simultánea
 - `404` — No se encontró la sede
+
+---
+
+### GET `/api/ingresos` — Consultar accesos actuales en todas las sedes
+
+> **Acceso:** Solo **ADMIN**
+
+Retorna la lista de todas las personas que se encuentran actualmente dentro de cualquier sede.
+
+**Response 200:**
+```json
+[
+  {
+    "id": 1,
+    "documento": "1001234567",
+    "nombreCompleto": "María García",
+    "sedeId": 1,
+    "sedeNombre": "Sede Norte",
+    "fechaHoraIngreso": "2026-03-05T10:30:00"
+  },
+  {
+    "id": 2,
+    "documento": "9009876543",
+    "nombreCompleto": "Carlos López",
+    "sedeId": 2,
+    "sedeNombre": "Sede Sur",
+    "fechaHoraIngreso": "2026-03-05T11:00:00"
+  }
+]
+```
+
+---
+
+### GET `/api/ingresos/mi-sede` — Consultar personas actualmente en mi sede
+
+> **Acceso:** Solo **OPERADOR**
+
+Retorna las personas que se encuentran actualmente dentro de la sede asignada al operador autenticado.
+
+**Response 200:**
+```json
+[
+  {
+    "id": 1,
+    "documento": "1001234567",
+    "nombreCompleto": "María García",
+    "sedeId": 1,
+    "sedeNombre": "Sede Norte",
+    "fechaHoraIngreso": "2026-03-05T10:30:00"
+  }
+]
+```
+
+**Posibles errores:**
+- `404` — El operador autenticado no tiene una sede asignada
 
 ---
 

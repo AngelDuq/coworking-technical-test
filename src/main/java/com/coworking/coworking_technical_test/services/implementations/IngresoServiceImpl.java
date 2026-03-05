@@ -1,7 +1,9 @@
 package com.coworking.coworking_technical_test.services.implementations;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -9,12 +11,14 @@ import org.springframework.stereotype.Service;
 import com.coworking.coworking_technical_test.entities.Ingreso;
 import com.coworking.coworking_technical_test.entities.Persona;
 import com.coworking.coworking_technical_test.entities.Sede;
+import com.coworking.coworking_technical_test.entities.Usuario;
 import com.coworking.coworking_technical_test.exceptions.BusinessException;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.IngresoMapper;
 import com.coworking.coworking_technical_test.repositories.IngresoRepository;
 import com.coworking.coworking_technical_test.repositories.PersonaRepository;
 import com.coworking.coworking_technical_test.repositories.SedeRepository;
+import com.coworking.coworking_technical_test.repositories.UsuarioRepository;
 import com.coworking.coworking_technical_test.services.interfaces.IIngresoService;
 import com.coworking.coworking_technical_test.shared.dto.IngresoDTO;
 import com.coworking.coworking_technical_test.shared.request.IngresoRequest;
@@ -28,6 +32,7 @@ public class IngresoServiceImpl implements IIngresoService {
     private final IngresoRepository ingresoRepository;
     private final PersonaRepository personaRepository;
     private final SedeRepository sedeRepository;
+    private final UsuarioRepository usuarioRepository;
     private final IngresoMapper ingresoMapper;
     private final MessageSource messageSource;
 
@@ -71,6 +76,28 @@ public class IngresoServiceImpl implements IIngresoService {
 
         Ingreso saved = ingresoRepository.save(ingreso);
         return ingresoMapper.toDTO(saved);
+    }
+
+    @Override
+    public List<IngresoDTO> obtenerAccesosActuales() {
+        return ingresoRepository.findAll().stream()
+                .map(ingresoMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<IngresoDTO> obtenerAccesosPorSede(String emailOperador) {
+        Usuario operador = usuarioRepository.findByEmail(emailOperador)
+                .orElseThrow(() -> new NotFoundException(
+                        messageSource.getMessage("UsuarioNotFound", null, Locale.getDefault())));
+
+        Sede sede = sedeRepository.findByOperadorId(operador.getId())
+                .orElseThrow(() -> new NotFoundException(
+                        messageSource.getMessage("SedeNotFound", null, Locale.getDefault())));
+
+        return ingresoRepository.findBySedeId(sede.getId()).stream()
+                .map(ingresoMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 }
