@@ -17,7 +17,8 @@ public interface IngresoRepository extends JpaRepository<Ingreso, Integer> {
 
     long countBySedeId(Integer sedeId);
 
-    // Personas con ingreso activo que no tienen registros en histórico (primera vez)
+    // Personas con ingreso activo que no tienen registros en histórico (primera
+    // vez)
     @Query("SELECT i FROM Ingreso i WHERE i.persona.id NOT IN (SELECT DISTINCT h.persona.id FROM Historico h)")
     List<Ingreso> findPersonasPrimerIngreso();
 

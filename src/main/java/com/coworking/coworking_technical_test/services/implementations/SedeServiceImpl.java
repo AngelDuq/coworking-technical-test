@@ -82,7 +82,8 @@ public class SedeServiceImpl implements ISedeService {
 
         // Validar que el usuario tenga rol OPERADOR
         if (operador.getRol() == null || !"OPERADOR".equalsIgnoreCase(operador.getRol().getDescripcion())) {
-            throw new BusinessException("El usuario seleccionado no tiene el rol OPERADOR.");
+            throw new BusinessException(
+                    messageSource.getMessage("UsuarioNoEsOperador", null, Locale.getDefault()));
         }
 
         sede.setOperador(operador);
