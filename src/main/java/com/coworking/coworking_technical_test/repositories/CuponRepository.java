@@ -5,5 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.coworking.coworking_technical_test.entities.Cupon;
 
 public interface CuponRepository extends JpaRepository<Cupon, Integer> {
-    
+
+    boolean existsByPersonaIdAndSedeId(Integer personaId, Integer sedeId);
+
 }
