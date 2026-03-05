@@ -117,7 +117,7 @@ spring.datasource.password=1234
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/TU_USUARIO/coworking-technical-test.git
+git clone https://github.com/AngelDuq/coworking-technical-test.git
 cd coworking-technical-test
 ```
 
