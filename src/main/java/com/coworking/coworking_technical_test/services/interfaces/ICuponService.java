@@ -7,4 +7,6 @@ public interface ICuponService {
 
     void verificarYGenerarCupon(Persona persona, Sede sede);
 
+    void expirarCuponesVencidos();
+
 }

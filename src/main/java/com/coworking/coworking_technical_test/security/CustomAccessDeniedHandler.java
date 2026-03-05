@@ -8,34 +8,34 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class);
+    private static final Logger log = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Override
-    public void commence(HttpServletRequest request,
+    public void handle(HttpServletRequest request,
             HttpServletResponse response,
-            AuthenticationException authException) throws IOException {
+            AccessDeniedException accessDeniedException) throws IOException {
 
         String path = request.getServletPath();
-        log.warn("Acceso no autorizado en [{}]: {}", path, authException.getMessage());
+        log.warn("Acceso denegado en [{}]: {}", path, accessDeniedException.getMessage());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
         ErrorResponse error = ErrorResponse.builder()
-                .status(HttpServletResponse.SC_UNAUTHORIZED)
-                .error("Unauthorized")
-                .message("No esta autorizado para acceder a este recurso. Token invalido o ausente.")
+                .status(HttpServletResponse.SC_FORBIDDEN)
+                .error("Forbidden")
+                .message("No tiene permisos para acceder a este recurso.")
                 .path(path)
                 .build();
 

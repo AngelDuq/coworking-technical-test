@@ -1,10 +1,12 @@
 package com.coworking.coworking_technical_test.services.implementations;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.coworking.coworking_technical_test.entities.Cupon;
 import com.coworking.coworking_technical_test.entities.Cupon.EstadoCupon;
@@ -73,6 +75,26 @@ public class CuponServiceImpl implements ICuponService {
                 .build();
 
         notificacionService.enviarNotificacion(notificacion);
+    }
+
+    @Override
+    @Transactional
+    public void expirarCuponesVencidos() {
+        LocalDate hoy = LocalDate.now();
+        List<Cupon> cuponesVencidos = cuponRepository
+                .findByEstadoAndFechaVencimientoBefore(EstadoCupon.ACTIVO, hoy);
+
+        if (cuponesVencidos.isEmpty()) {
+            log.info("No se encontraron cupones activos vencidos para expirar.");
+            return;
+        }
+
+        for (Cupon cupon : cuponesVencidos) {
+            cupon.setEstado(EstadoCupon.EXPIRADO);
+        }
+        cuponRepository.saveAll(cuponesVencidos);
+
+        log.info("Se expiraron {} cupones vencidos.", cuponesVencidos.size());
     }
 
 }

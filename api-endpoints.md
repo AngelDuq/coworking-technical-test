@@ -60,6 +60,25 @@ Content-Type: application/json
 
 ---
 
+### POST `/auth/logout` — Cerrar sesión
+
+> **Acceso:** Requiere token JWT válido (`Authorization: Bearer <token>`)
+
+Invalida el token JWT del usuario autenticado agregándolo a una **lista negra** persistida en base de datos. Una vez cerrada la sesión, el token no podrá ser reutilizado aunque todavía no haya expirado.
+
+**Headers requeridos:**
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+```
+
+**Response 204:** Sin contenido (sesión cerrada exitosamente)
+
+**Response 401:** Token inválido, expirado o no proporcionado
+
+> Después de hacer logout, cualquier request con ese token será rechazado con `401 Unauthorized`, incluso si el token no ha expirado naturalmente.
+
+---
+
 ## 2. Sedes
 
 > **Acceso:** Todos los endpoints de sedes requieren rol **ADMIN**

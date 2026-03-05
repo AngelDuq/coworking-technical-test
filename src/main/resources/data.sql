@@ -1,4 +1,14 @@
 -- ================================
+-- Tabla: blacklisted_token
+-- ================================
+CREATE TABLE IF NOT EXISTS blacklisted_token (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token TEXT NOT NULL,
+    expires_at DATETIME NOT NULL,
+    UNIQUE KEY uq_blacklisted_token (token(255))
+);
+
+-- ================================
 -- Tabla: rol
 -- ================================
 CREATE TABLE IF NOT EXISTS rol (
