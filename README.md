@@ -39,20 +39,74 @@ API REST para la gestión de espacios de coworking desarrollada con Spring Boot.
 CREATE DATABASE IF NOT EXISTS coworking;
 ```
 
-3. Verifica que las credenciales coincidan con las del archivo `application.properties`:
+3. La aplicación se conecta a MySQL mediante **variables de entorno**. El archivo `src/main/resources/application.properties` contiene:
 
-| Propiedad | Valor por defecto |
-|---|---|
-| URL | `jdbc:mysql://localhost:3306/coworking` |
-| Usuario | `root` |
-| Contraseña | `1234` |
+```properties
+spring.datasource.url=jdbc:mysql://${MYSQL_HOSTNAME}:${MYSQL_PORT}/${MYSQL_DATABASE}?...
+spring.datasource.username=${MYSQL_USERNAME}
+spring.datasource.password=${MYSQL_PASSWORD}
+```
 
-> Si tu contraseña de MySQL es diferente, modifícala en `src/main/resources/application.properties`:
->
-> ```properties
-> spring.datasource.username=root
-> spring.datasource.password=TU_PASSWORD
-> ```
+Debes definir las siguientes variables de entorno antes de ejecutar la aplicación:
+
+| Variable de entorno | Descripción | Ejemplo |
+|---|---|---|
+| `MYSQL_HOSTNAME` | Host donde corre MySQL | `localhost` |
+| `MYSQL_PORT` | Puerto de MySQL | `3306` |
+| `MYSQL_DATABASE` | Nombre de la base de datos | `coworking` |
+| `MYSQL_USERNAME` | Usuario de MySQL | `root` |
+| `MYSQL_PASSWORD` | Contraseña de MySQL | `1234` |
+
+### Opción A — Variables de entorno en terminal
+
+**Windows (CMD):**
+```cmd
+set MYSQL_HOSTNAME=localhost
+set MYSQL_PORT=3306
+set MYSQL_DATABASE=coworking
+set MYSQL_USERNAME=root
+set MYSQL_PASSWORD=1234
+.\mvnw.cmd spring-boot:run
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:MYSQL_HOSTNAME="localhost"
+$env:MYSQL_PORT="3306"
+$env:MYSQL_DATABASE="coworking"
+$env:MYSQL_USERNAME="root"
+$env:MYSQL_PASSWORD="1234"
+.\mvnw.cmd spring-boot:run
+```
+
+**Linux / macOS:**
+```bash
+export MYSQL_HOSTNAME=localhost
+export MYSQL_PORT=3306
+export MYSQL_DATABASE=coworking
+export MYSQL_USERNAME=root
+export MYSQL_PASSWORD=1234
+./mvnw spring-boot:run
+```
+
+### Opción B — Conexión local hardcodeada (desarrollo rápido)
+
+Si prefieres evitar las variables de entorno para desarrollo local, el archivo `application.properties` incluye las credenciales locales comentadas. Solo descomenta esas líneas y comenta las que usan variables de entorno:
+
+```properties
+# Descomenta estas líneas para conexión local directa:
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost:3306/coworking?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=America/Bogota
+spring.datasource.username=root
+spring.datasource.password=1234
+
+# Comenta o elimina estas líneas:
+# spring.datasource.url=jdbc:mysql://${MYSQL_HOSTNAME}:${MYSQL_PORT}/${MYSQL_DATABASE}?...
+# spring.datasource.username=${MYSQL_USERNAME}
+# spring.datasource.password=${MYSQL_PASSWORD}
+```
+
+> Las credenciales locales preconfiguradas son `root` / `1234`. Ajústalas según tu entorno si es necesario.
 
 4. Las tablas y datos iniciales se crean automáticamente al iniciar la aplicación (`ddl-auto=update` + `data.sql`).
 
