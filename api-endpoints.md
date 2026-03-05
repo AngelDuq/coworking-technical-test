@@ -9,10 +9,11 @@
 1. [Autenticación](#1-autenticación)
 2. [Sedes (ADMIN)](#2-sedes)
 3. [Usuarios (ADMIN)](#3-usuarios)
-4. [Ingresos (OPERADOR)](#4-ingresos)
-5. [Salidas (OPERADOR)](#5-salidas)
-6. [Indicadores](#6-indicadores)
-7. [Notificaciones (ADMIN / OPERADOR)](#7-notificaciones)
+4. [Personas (ADMIN / OPERADOR)](#4-personas)
+5. [Ingresos (OPERADOR)](#5-ingresos)
+6. [Salidas (OPERADOR)](#6-salidas)
+7. [Indicadores](#7-indicadores)
+8. [Notificaciones (ADMIN / OPERADOR)](#8-notificaciones)
 
 ---
 
@@ -193,7 +194,7 @@ Content-Type: application/json
 
 ## 3. Usuarios
 
-> **Acceso:** Requiere rol **ADMIN**
+> **Acceso:** Todos los endpoints de usuarios requieren rol **ADMIN**
 
 ### POST `/api/usuarios/operadores` — Crear operador
 
@@ -224,7 +225,196 @@ Content-Type: application/json
 
 ---
 
-## 4. Ingresos
+### GET `/api/usuarios` — Obtener todos los usuarios
+
+**Response 200:**
+```json
+[
+  {
+    "id": 1,
+    "nombre": "Admin",
+    "apellido": "Sistema",
+    "documento": "000000001",
+    "email": "admin@mail.com",
+    "rol": "ADMIN"
+  },
+  {
+    "id": 2,
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "documento": "123456789",
+    "email": "juan.perez@mail.com",
+    "rol": "OPERADOR"
+  }
+]
+```
+
+---
+
+### GET `/api/usuarios/{id}` — Obtener usuario por ID
+
+**Ejemplo:** `GET /api/usuarios/2`
+
+**Response 200:**
+```json
+{
+  "id": 2,
+  "nombre": "Juan",
+  "apellido": "Pérez",
+  "documento": "123456789",
+  "email": "juan.perez@mail.com",
+  "rol": "OPERADOR"
+}
+```
+
+---
+
+### PUT `/api/usuarios/{id}` — Actualizar usuario
+
+**Ejemplo:** `PUT /api/usuarios/2`
+
+**Request Body:**
+```json
+{
+  "nombre": "Juan Carlos",
+  "apellido": "Pérez López",
+  "documento": "123456789",
+  "email": "juanc.perez@mail.com"
+}
+```
+
+**Response 200:**
+```json
+{
+  "id": 2,
+  "nombre": "Juan Carlos",
+  "apellido": "Pérez López",
+  "documento": "123456789",
+  "email": "juanc.perez@mail.com",
+  "rol": "OPERADOR"
+}
+```
+
+**Posibles errores:**
+- `404` — No se encontró el usuario
+- `400` — Ya existe un usuario registrado con ese email o documento
+
+---
+
+### DELETE `/api/usuarios/{id}` — Eliminar usuario
+
+**Ejemplo:** `DELETE /api/usuarios/2`
+
+**Response 204:** Sin contenido
+
+---
+
+## 4. Personas
+
+> **Acceso:** Todos los endpoints de personas requieren rol **ADMIN** o **OPERADOR**
+
+### POST `/api/personas` — Crear persona
+
+**Request Body:**
+```json
+{
+  "documento": "1001234567",
+  "nombre": "María",
+  "apellido": "García",
+  "email": "maria.garcia@mail.com"
+}
+```
+
+**Response 201:**
+```json
+{
+  "id": 1,
+  "documento": "1001234567",
+  "nombre": "María",
+  "apellido": "García",
+  "email": "maria.garcia@mail.com"
+}
+```
+
+**Posibles errores:**
+- `400` — Ya existe una persona registrada con ese documento
+
+---
+
+### GET `/api/personas` — Obtener todas las personas
+
+**Response 200:**
+```json
+[
+  {
+    "id": 1,
+    "documento": "1001234567",
+    "nombre": "María",
+    "apellido": "García",
+    "email": "maria.garcia@mail.com"
+  }
+]
+```
+
+---
+
+### GET `/api/personas/{id}` — Obtener persona por ID
+
+**Ejemplo:** `GET /api/personas/1`
+
+**Response 200:**
+```json
+{
+  "id": 1,
+  "documento": "1001234567",
+  "nombre": "María",
+  "apellido": "García",
+  "email": "maria.garcia@mail.com"
+}
+```
+
+---
+
+### PUT `/api/personas/{id}` — Actualizar persona
+
+**Ejemplo:** `PUT /api/personas/1`
+
+**Request Body:**
+```json
+{
+  "documento": "1001234567",
+  "nombre": "María Fernanda",
+  "apellido": "García López",
+  "email": "mariaf.garcia@mail.com"
+}
+```
+
+**Response 200:**
+```json
+{
+  "id": 1,
+  "documento": "1001234567",
+  "nombre": "María Fernanda",
+  "apellido": "García López",
+  "email": "mariaf.garcia@mail.com"
+}
+```
+
+**Posibles errores:**
+- `404` — No se encontró la persona
+- `400` — Ya existe una persona registrada con ese documento
+
+---
+
+### DELETE `/api/personas/{id}` — Eliminar persona
+
+**Ejemplo:** `DELETE /api/personas/1`
+
+**Response 204:** Sin contenido
+
+---
+
+## 5. Ingresos
 
 > **Acceso:** Requiere rol **OPERADOR**
 
@@ -259,7 +449,7 @@ Content-Type: application/json
 
 ---
 
-## 5. Salidas
+## 6. Salidas
 
 > **Acceso:** Requiere rol **OPERADOR**
 
@@ -294,7 +484,7 @@ Content-Type: application/json
 
 ---
 
-## 6. Indicadores
+## 7. Indicadores
 
 ### GET `/api/indicadores/top-personas` — Top 10 personas con más ingresos
 
@@ -400,7 +590,7 @@ Content-Type: application/json
 
 ---
 
-## 7. Notificaciones
+## 8. Notificaciones
 
 > **Acceso:** **ADMIN** o **OPERADOR**
 
