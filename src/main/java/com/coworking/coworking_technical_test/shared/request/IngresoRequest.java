@@ -17,13 +17,13 @@ public class IngresoRequest {
     @Size(max = 15, message = "El documento no puede superar 15 caracteres")
     private String documento;
 
-    @NotBlank(message = "El nombre es obligatorio")
+    // @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
-    @NotBlank(message = "El apellido es obligatorio")
+    // @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
 
-    @Email(message = "El email debe tener un formato válido")
+    // @Email(message = "El email debe tener un formato válido")
     private String email;
 
     @NotNull(message = "El ID de la sede es obligatorio")
