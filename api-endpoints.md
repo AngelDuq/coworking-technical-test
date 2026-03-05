@@ -14,6 +14,7 @@
 6. [Salidas (OPERADOR)](#6-salidas)
 7. [Indicadores](#7-indicadores)
 8. [Notificaciones (ADMIN / OPERADOR)](#8-notificaciones)
+9. [Tareas Programadas (Scheduler)](#9-tareas-programadas-scheduler)
 
 ---
 
@@ -635,6 +636,72 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 ```
 
 > Este endpoint imprime la notificación en los logs del servidor (microservicio simulado). También se invoca automáticamente cuando se genera un cupón de fidelidad al registrar una salida.
+
+---
+
+---
+
+## 9. Tareas Programadas (Scheduler)
+
+> Las tareas programadas se ejecutan automáticamente en segundo plano. **No exponen endpoints HTTP** — son procesos internos del servidor.
+
+---
+
+### Expiración automática de cupones vencidos
+
+**Clase:** `CuponScheduler`  
+**Método:** `expirarCuponesVencidos()`  
+**Expresión cron:** `0 0 0 * * *`  
+**Frecuencia:** Todos los días a las **00:00 (12:00 AM)**
+
+#### ¿Qué hace?
+
+Cada medianoche el sistema revisa todos los cupones en estado `ACTIVO` cuya `fechaVencimiento` sea anterior a la fecha actual. Por cada cupón vencido encontrado:
+
+1. Cambia su estado de `ACTIVO` → `EXPIRADO`
+2. Persiste los cambios en base de datos
+3. Registra un log en consola con la cantidad de cupones expirados
+
+#### Reglas de negocio asociadas
+
+| Regla | Detalle |
+|---|---|
+| Vigencia del cupón | 10 días calendario desde su generación |
+| Condición de expiración | `fechaVencimiento < fechaActual` y estado `ACTIVO` |
+| Estados posibles | `ACTIVO` → `UTILIZADO` (manual) / `EXPIRADO` (automático) |
+| Cupón expirado | No puede redimirse ni reactivarse |
+| Cupón utilizado | Tampoco puede reutilizarse |
+
+#### Logs en consola
+
+Cuando la tarea se ejecuta, se imprimen los siguientes mensajes en el log del servidor:
+
+```
+INFO  CuponScheduler - Iniciando tarea programada: verificacion de cupones vencidos.
+INFO  CuponServiceImpl - Se expiraron 3 cupones vencidos.
+INFO  CuponScheduler - Tarea programada finalizada: verificacion de cupones vencidos.
+```
+
+Si no hay cupones vencidos:
+
+```
+INFO  CuponScheduler - Iniciando tarea programada: verificacion de cupones vencidos.
+INFO  CuponServiceImpl - No se encontraron cupones activos vencidos para expirar.
+INFO  CuponScheduler - Tarea programada finalizada: verificacion de cupones vencidos.
+```
+
+#### Relación con los cupones de fidelidad
+
+Los cupones son generados automáticamente al registrar una **salida** (`POST /api/salidas`) cuando la persona acumula más de 20 horas en una misma sede. El flujo completo es:
+
+```
+POST /api/salidas
+  └─► CuponServiceImpl.verificarYGenerarCupon()  →  genera cupón (ACTIVO, vigencia 10 días)
+                                                  →  envía notificación al usuario
+
+Todos los días a las 00:00
+  └─► CuponScheduler.expirarCuponesVencidos()     →  cupones vencidos pasan a EXPIRADO
+```
 
 ---
 
