@@ -1,5 +1,6 @@
 package com.coworking.coworking_technical_test.shared.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -21,6 +22,9 @@ public class IngresoRequest {
 
     @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
+
+    @Email(message = "El email debe tener un formato válido")
+    private String email;
 
     @NotNull(message = "El ID de la sede es obligatorio")
     private Integer sedeId;

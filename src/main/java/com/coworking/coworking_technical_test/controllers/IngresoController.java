@@ -30,9 +30,9 @@ public class IngresoController {
 
     @PostMapping
     @PreAuthorize("hasRole('OPERADOR')")
-    @Operation(summary = "Registrar ingreso", description = "Registra el ingreso de una persona a una sede. Crea la persona si no existe.")
+    @Operation(summary = "Registrar ingreso", description = "Registra el ingreso de una persona a una sede. Si la persona no existe, la crea con documento, nombre, apellido y email proporcionados.")
     @ApiResponse(responseCode = "201", description = "Ingreso registrado exitosamente")
-    @ApiResponse(responseCode = "400", description = "Persona con ingreso activo o sede sin capacidad")
+    @ApiResponse(responseCode = "400", description = "Persona con ingreso activo, sede sin capacidad o email con formato inválido")
     @ApiResponse(responseCode = "404", description = "Sede no encontrada")
     public ResponseEntity<IngresoDTO> registrarIngreso(@Valid @RequestBody IngresoRequest request) {
         IngresoDTO ingreso = ingresoService.registrarIngreso(request);

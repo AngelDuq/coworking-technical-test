@@ -446,9 +446,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
   "documento": "1001234567",
   "nombre": "María",
   "apellido": "García",
+  "email": "maria.garcia@mail.com",
   "sedeId": 1
 }
 ```
+
+> El campo `email` es opcional pero debe tener formato válido si se proporciona. Se guarda únicamente cuando la persona se registra por primera vez en el sistema.
 
 **Response 201:**
 ```json

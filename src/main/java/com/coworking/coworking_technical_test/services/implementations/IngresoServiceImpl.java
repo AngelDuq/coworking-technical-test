@@ -41,6 +41,7 @@ public class IngresoServiceImpl implements IIngresoService {
                     nueva.setDocumento(request.getDocumento());
                     nueva.setNombre(request.getNombre());
                     nueva.setApellido(request.getApellido());
+                    nueva.setEmail(request.getEmail());
                     return personaRepository.save(nueva);
                 });
 
