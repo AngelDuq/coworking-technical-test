@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "sede")
 public class Sede {
 
@@ -46,9 +48,6 @@ public class Sede {
     @Column(name = "precio_hora", precision = 10, scale = 2, nullable = false)
     private BigDecimal precioHora;
 
-    /**
-     * Operador (Usuario con rol OPERADOR) asignado a esta sede.
-     */
     @ManyToOne
     @JoinColumn(name = "operador_id")
     private Usuario operador;
