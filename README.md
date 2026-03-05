@@ -205,31 +205,34 @@ Al iniciar la aplicación, se crean automáticamente:
 | # | Método | Ruta | Descripción | Acceso |
 |---|---|---|---|---|
 | 1 | POST | `/auth/login` | Iniciar sesión | Público |
-| 2 | POST | `/api/sedes` | Crear sede | ADMIN |
-| 3 | GET | `/api/sedes` | Obtener todas las sedes | ADMIN |
-| 4 | GET | `/api/sedes/{id}` | Obtener sede por ID | ADMIN |
-| 5 | PUT | `/api/sedes/{id}` | Actualizar sede | ADMIN |
-| 6 | DELETE | `/api/sedes/{id}` | Eliminar sede | ADMIN |
-| 7 | PUT | `/api/sedes/{id}/operador` | Asignar operador a sede | ADMIN |
-| 8 | POST | `/api/usuarios/operadores` | Crear operador | ADMIN |
-| 9 | GET | `/api/usuarios` | Obtener todos los usuarios | ADMIN |
-| 10 | GET | `/api/usuarios/{id}` | Obtener usuario por ID | ADMIN |
-| 11 | PUT | `/api/usuarios/{id}` | Actualizar usuario | ADMIN |
-| 12 | DELETE | `/api/usuarios/{id}` | Eliminar usuario | ADMIN |
-| 13 | POST | `/api/personas` | Crear persona | ADMIN / OPERADOR |
-| 14 | GET | `/api/personas` | Obtener todas las personas | ADMIN / OPERADOR |
-| 15 | GET | `/api/personas/{id}` | Obtener persona por ID | ADMIN / OPERADOR |
-| 16 | PUT | `/api/personas/{id}` | Actualizar persona | ADMIN / OPERADOR |
-| 17 | DELETE | `/api/personas/{id}` | Eliminar persona | ADMIN / OPERADOR |
-| 18 | POST | `/api/ingresos` | Registrar ingreso | OPERADOR |
-| 19 | POST | `/api/salidas` | Registrar salida | OPERADOR |
-| 20 | GET | `/api/indicadores/top-personas` | Top 10 personas con más ingresos | ADMIN / OPERADOR |
-| 21 | GET | `/api/indicadores/top-personas/sede/{sedeId}` | Top 10 personas por sede | ADMIN / OPERADOR |
-| 22 | GET | `/api/indicadores/primer-ingreso` | Personas con primer ingreso | ADMIN / OPERADOR |
-| 23 | GET | `/api/indicadores/ingresos-economicos` | Ingresos económicos del operador | OPERADOR |
-| 24 | GET | `/api/indicadores/top-operadores` | Top 3 operadores de la semana | ADMIN |
-| 25 | GET | `/api/indicadores/top-sedes-facturacion` | Top 3 sedes por facturación | ADMIN |
-| 26 | POST | `/api/notificaciones` | Enviar notificación simulada | ADMIN / OPERADOR |
+| 2 | POST | `/auth/logout` | Cerrar sesión / invalidar token | Autenticado |
+| 3 | POST | `/api/sedes` | Crear sede | ADMIN |
+| 4 | GET | `/api/sedes` | Obtener todas las sedes | ADMIN |
+| 5 | GET | `/api/sedes/{id}` | Obtener sede por ID | ADMIN |
+| 6 | PUT | `/api/sedes/{id}` | Actualizar sede | ADMIN |
+| 7 | DELETE | `/api/sedes/{id}` | Eliminar sede | ADMIN |
+| 8 | PUT | `/api/sedes/{id}/operador` | Asignar operador a sede | ADMIN |
+| 9 | POST | `/api/usuarios/operadores` | Crear operador | ADMIN |
+| 10 | GET | `/api/usuarios` | Obtener todos los usuarios | ADMIN |
+| 11 | GET | `/api/usuarios/{id}` | Obtener usuario por ID | ADMIN |
+| 12 | PUT | `/api/usuarios/{id}` | Actualizar usuario | ADMIN |
+| 13 | DELETE | `/api/usuarios/{id}` | Eliminar usuario | ADMIN |
+| 14 | POST | `/api/personas` | Crear persona | ADMIN / OPERADOR |
+| 15 | GET | `/api/personas` | Obtener todas las personas | ADMIN / OPERADOR |
+| 16 | GET | `/api/personas/{id}` | Obtener persona por ID | ADMIN / OPERADOR |
+| 17 | PUT | `/api/personas/{id}` | Actualizar persona | ADMIN / OPERADOR |
+| 18 | DELETE | `/api/personas/{id}` | Eliminar persona | ADMIN / OPERADOR |
+| 19 | POST | `/api/ingresos` | Registrar ingreso de persona | OPERADOR |
+| 20 | GET | `/api/ingresos` | Accesos activos en todas las sedes | ADMIN |
+| 21 | GET | `/api/ingresos/mi-sede` | Personas activas en la sede del operador | OPERADOR |
+| 22 | POST | `/api/salidas` | Registrar salida de persona | OPERADOR |
+| 23 | GET | `/api/indicadores/top-personas` | Top 10 personas con más ingresos | ADMIN / OPERADOR |
+| 24 | GET | `/api/indicadores/top-personas/sede/{sedeId}` | Top 10 personas por sede | ADMIN / OPERADOR |
+| 25 | GET | `/api/indicadores/primer-ingreso` | Personas con primer ingreso | ADMIN / OPERADOR |
+| 26 | GET | `/api/indicadores/ingresos-economicos` | Ingresos económicos del operador | OPERADOR |
+| 27 | GET | `/api/indicadores/top-operadores` | Top 3 operadores de la semana | ADMIN |
+| 28 | GET | `/api/indicadores/top-sedes-facturacion` | Top 3 sedes por facturación | ADMIN |
+| 29 | POST | `/api/notificaciones` | Enviar notificación simulada | ADMIN / OPERADOR |
 
 ---
 
