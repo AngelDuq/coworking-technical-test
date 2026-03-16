@@ -2,6 +2,7 @@ package com.coworking.coworking_technical_test.services.interfaces;
 
 import com.coworking.coworking_technical_test.entities.Persona;
 import com.coworking.coworking_technical_test.entities.Sede;
+import com.coworking.coworking_technical_test.shared.responses.CuponRedencionResponse;
 
 public interface ICuponService {
 
@@ -9,6 +10,6 @@ public interface ICuponService {
 
     void expirarCuponesVencidos();
     
-    void redimirCupon(Integer cuponId);
+    CuponRedencionResponse redimirCupon(Integer cuponId);
 
 }

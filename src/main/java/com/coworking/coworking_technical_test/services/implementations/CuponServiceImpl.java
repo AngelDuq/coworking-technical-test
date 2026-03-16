@@ -12,11 +12,15 @@ import com.coworking.coworking_technical_test.entities.Cupon;
 import com.coworking.coworking_technical_test.entities.Cupon.EstadoCupon;
 import com.coworking.coworking_technical_test.entities.Persona;
 import com.coworking.coworking_technical_test.entities.Sede;
+import com.coworking.coworking_technical_test.exceptions.BusinessException;
+import com.coworking.coworking_technical_test.exceptions.NotFoundException;
+import com.coworking.coworking_technical_test.mappers.CuponMapper;
 import com.coworking.coworking_technical_test.repositories.CuponRepository;
 import com.coworking.coworking_technical_test.repositories.HistoricoRepository;
 import com.coworking.coworking_technical_test.services.interfaces.ICuponService;
 import com.coworking.coworking_technical_test.services.interfaces.INotificacionService;
 import com.coworking.coworking_technical_test.shared.request.NotificacionRequest;
+import com.coworking.coworking_technical_test.shared.responses.CuponRedencionResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +35,7 @@ public class CuponServiceImpl implements ICuponService {
     private final HistoricoRepository historicoRepository;
     private final CuponRepository cuponRepository;
     private final INotificacionService notificacionService;
+    private final CuponMapper cuponMapper;
 
     @Override
     public void verificarYGenerarCupon(Persona persona, Sede sede) {
@@ -97,19 +102,24 @@ public class CuponServiceImpl implements ICuponService {
         log.info("Se expiraron {} cupones vencidos.", cuponesVencidos.size());
     }
 
-    
-    public void redimirCupon(Integer cuponId) {
+    @Override
+    @Transactional
+    public CuponRedencionResponse redimirCupon(Integer cuponId) {
         Cupon cupon = cuponRepository.findById(cuponId)
-                .orElseThrow(() -> new RuntimeException("Cupón no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Cupón no encontrado"));
 
         if (cupon.getEstado() != EstadoCupon.ACTIVO) {
-            throw new RuntimeException("El cupón no está activo y no puede ser redimido");
+            throw new BusinessException("El cupón no está activo y no puede ser redimido");
         }
 
+        EstadoCupon estadoAnterior = cupon.getEstado();
         cupon.setEstado(EstadoCupon.UTILIZADO);
+        cupon.setFechaUso(LocalDate.now());
         cuponRepository.save(cupon);
 
         log.info("Cupón con ID {} redimido exitosamente.", cuponId);
+
+        return cuponMapper.toRedencionResponse(cupon, estadoAnterior, "Cupón redimido exitosamente");
     }
 
 }
