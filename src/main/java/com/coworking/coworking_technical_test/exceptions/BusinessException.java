@@ -6,4 +6,8 @@ public class BusinessException extends RuntimeException {
         super(message);
     }
 
+    public BusinessException(MessageKey messageKey) {
+        super(messageKey.key());
+    }
+
 }

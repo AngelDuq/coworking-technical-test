@@ -1,14 +1,13 @@
 package com.coworking.coworking_technical_test.services.implementations;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import com.coworking.coworking_technical_test.entities.Persona;
 import com.coworking.coworking_technical_test.exceptions.BusinessException;
+import com.coworking.coworking_technical_test.exceptions.MessageKey;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.PersonaMapper;
 import com.coworking.coworking_technical_test.repositories.PersonaRepository;
@@ -24,13 +23,11 @@ public class PersonaServiceImpl implements IPersonaService {
 
     private final PersonaRepository personaRepository;
     private final PersonaMapper personaMapper;
-    private final MessageSource messageSource;
 
     @Override
     public PersonaDTO crear(PersonaRequest request) {
         personaRepository.findByDocumento(request.getDocumento()).ifPresent(p -> {
-            throw new BusinessException(
-                    messageSource.getMessage("PersonaDocumentoDuplicado", null, Locale.getDefault()));
+            throw new BusinessException(MessageKey.PERSONA_DOCUMENTO_DUPLICADO);
         });
 
         Persona persona = personaMapper.toEntity(request);
@@ -41,8 +38,7 @@ public class PersonaServiceImpl implements IPersonaService {
     @Override
     public PersonaDTO obtenerPorId(Integer id) {
         Persona persona = personaRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("PersonaNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.PERSONA_NOT_FOUND));
         return personaMapper.toDTO(persona);
     }
 
@@ -56,14 +52,12 @@ public class PersonaServiceImpl implements IPersonaService {
     @Override
     public PersonaDTO actualizar(Integer id, PersonaRequest request) {
         Persona persona = personaRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("PersonaNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.PERSONA_NOT_FOUND));
 
         personaRepository.findByDocumento(request.getDocumento())
                 .filter(p -> !p.getId().equals(id))
                 .ifPresent(p -> {
-                    throw new BusinessException(
-                            messageSource.getMessage("PersonaDocumentoDuplicado", null, Locale.getDefault()));
+                    throw new BusinessException(MessageKey.PERSONA_DOCUMENTO_DUPLICADO);
                 });
 
         personaMapper.updateEntity(persona, request);
@@ -74,8 +68,7 @@ public class PersonaServiceImpl implements IPersonaService {
     @Override
     public void eliminar(Integer id) {
         Persona persona = personaRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("PersonaNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.PERSONA_NOT_FOUND));
         personaRepository.delete(persona);
     }
 

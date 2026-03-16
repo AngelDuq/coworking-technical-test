@@ -2,10 +2,8 @@ package com.coworking.coworking_technical_test.services.implementations;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import com.coworking.coworking_technical_test.entities.Ingreso;
@@ -13,6 +11,7 @@ import com.coworking.coworking_technical_test.entities.Persona;
 import com.coworking.coworking_technical_test.entities.Sede;
 import com.coworking.coworking_technical_test.entities.Usuario;
 import com.coworking.coworking_technical_test.exceptions.BusinessException;
+import com.coworking.coworking_technical_test.exceptions.MessageKey;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.IngresoMapper;
 import com.coworking.coworking_technical_test.repositories.IngresoRepository;
@@ -34,7 +33,6 @@ public class IngresoServiceImpl implements IIngresoService {
     private final SedeRepository sedeRepository;
     private final UsuarioRepository usuarioRepository;
     private final IngresoMapper ingresoMapper;
-    private final MessageSource messageSource;
 
     @Override
     public IngresoDTO registrarIngreso(IngresoRequest request) {
@@ -52,20 +50,17 @@ public class IngresoServiceImpl implements IIngresoService {
 
         // Validar que no exista ingreso activo del mismo documento en ninguna sede
         if (ingresoRepository.existsByPersona(persona)) {
-            throw new BusinessException(
-                    messageSource.getMessage("IngresoActivo", null, Locale.getDefault()));
+                        throw new BusinessException(MessageKey.INGRESO_ACTIVO);
         }
 
         // Buscar sede
         Sede sede = sedeRepository.findById(request.getSedeId())
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("SedeNotFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
 
         // Validar capacidad disponible
         long ocupacionActual = ingresoRepository.countBySedeId(sede.getId());
         if (ocupacionActual >= sede.getCapacidadMaxSimultanea()) {
-            throw new BusinessException(
-                    messageSource.getMessage("SedeCapacidadExcedida", null, Locale.getDefault()));
+                        throw new BusinessException(MessageKey.SEDE_CAPACIDAD_EXCEDIDA);
         }
 
         // Registrar ingreso con fecha y hora exacta
@@ -88,12 +83,10 @@ public class IngresoServiceImpl implements IIngresoService {
     @Override
     public List<IngresoDTO> obtenerAccesosPorSede(String emailOperador) {
         Usuario operador = usuarioRepository.findByEmail(emailOperador)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("UsuarioNotFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
 
         Sede sede = sedeRepository.findByOperadorId(operador.getId())
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("SedeNotFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
 
         return ingresoRepository.findBySedeId(sede.getId()).stream()
                 .map(ingresoMapper::toDTO)

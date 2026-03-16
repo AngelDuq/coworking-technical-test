@@ -1,12 +1,10 @@
 package com.coworking.coworking_technical_test.exceptions;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -27,16 +25,17 @@ import lombok.RequiredArgsConstructor;
 public class ExceptionHandling {
 
     private static final Logger log = LoggerFactory.getLogger(ExceptionHandling.class);
-    private final MessageSource messageSource;
+    private final MessageResolver messageResolver;
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex, WebRequest request) {
         String path = extractPath(request);
-        log.warn("NotFoundException en [{}]: {}", path, ex.getMessage());
+        String message = resolveMessage(ex.getMessage());
+        log.warn("NotFoundException en [{}]: {}", path, message);
         ErrorResponse error = ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .error("Not Found")
-                .message(ex.getMessage())
+            .message(message)
                 .path(path)
                 .build();
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
@@ -45,11 +44,12 @@ public class ExceptionHandling {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex, WebRequest request) {
         String path = extractPath(request);
-        log.warn("BusinessException en [{}]: {}", path, ex.getMessage());
+        String message = resolveMessage(ex.getMessage());
+        log.warn("BusinessException en [{}]: {}", path, message);
         ErrorResponse error = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Bad Request")
-                .message(ex.getMessage())
+            .message(message)
                 .path(path)
                 .build();
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
@@ -58,7 +58,7 @@ public class ExceptionHandling {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex, WebRequest request) {
         String path = extractPath(request);
-        String mensaje = messageSource.getMessage("CredencialesInvalidas", null, Locale.getDefault());
+        String mensaje = messageResolver.get(MessageKey.CREDENCIALES_INVALIDAS);
         log.warn("BadCredentialsException en [{}]: {}", path, mensaje);
         ErrorResponse error = ErrorResponse.builder()
                 .status(HttpStatus.UNAUTHORIZED.value())
@@ -128,6 +128,14 @@ public class ExceptionHandling {
 
     private String extractPath(WebRequest request) {
         return request.getDescription(false).replace("uri=", "");
+    }
+
+    private String resolveMessage(String rawMessage) {
+        MessageKey messageKey = MessageKey.fromKey(rawMessage);
+        if (messageKey == null) {
+            return rawMessage;
+        }
+        return messageResolver.get(messageKey);
     }
 
 }

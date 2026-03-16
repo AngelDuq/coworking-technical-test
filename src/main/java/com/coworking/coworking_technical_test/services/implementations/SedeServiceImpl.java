@@ -1,15 +1,14 @@
 package com.coworking.coworking_technical_test.services.implementations;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import com.coworking.coworking_technical_test.entities.Sede;
 import com.coworking.coworking_technical_test.entities.Usuario;
 import com.coworking.coworking_technical_test.exceptions.BusinessException;
+import com.coworking.coworking_technical_test.exceptions.MessageKey;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.SedeMapper;
 import com.coworking.coworking_technical_test.repositories.SedeRepository;
@@ -27,7 +26,6 @@ public class SedeServiceImpl implements ISedeService {
     private final SedeRepository sedeRepository;
     private final UsuarioRepository usuarioRepository;
     private final SedeMapper sedeMapper;
-    private final MessageSource messageSource;
 
     @Override
     public SedeDTO crear(SedeRequest request) {
@@ -39,8 +37,7 @@ public class SedeServiceImpl implements ISedeService {
     @Override
     public SedeDTO obtenerPorId(Integer id) {
         Sede sede = sedeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("SedeNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
         return sedeMapper.toDTO(sede);
     }
 
@@ -54,8 +51,7 @@ public class SedeServiceImpl implements ISedeService {
     @Override
     public SedeDTO actualizar(Integer id, SedeRequest request) {
         Sede sede = sedeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("SedeNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
 
         sedeMapper.updateEntity(sede, request);
         Sede sedeUpdated = sedeRepository.save(sede);
@@ -65,25 +61,21 @@ public class SedeServiceImpl implements ISedeService {
     @Override
     public void eliminar(Integer id) {
         Sede sede = sedeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("SedeNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
         sedeRepository.delete(sede);
     }
 
     @Override
     public SedeDTO asignarOperador(Integer sedeId, Integer operadorId) {
         Sede sede = sedeRepository.findById(sedeId)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("SedeNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
 
         Usuario operador = usuarioRepository.findById(operadorId)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("UsuarioNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
 
         // Validar que el usuario tenga rol OPERADOR
         if (operador.getRol() == null || !"OPERADOR".equalsIgnoreCase(operador.getRol().getDescripcion())) {
-            throw new BusinessException(
-                    messageSource.getMessage("UsuarioNoEsOperador", null, Locale.getDefault()));
+            throw new BusinessException(MessageKey.USUARIO_NO_ES_OPERADOR);
         }
 
         sede.setOperador(operador);

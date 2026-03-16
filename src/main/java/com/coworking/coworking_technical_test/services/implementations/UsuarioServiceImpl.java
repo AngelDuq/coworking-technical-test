@@ -1,16 +1,15 @@
 package com.coworking.coworking_technical_test.services.implementations;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.coworking.coworking_technical_test.entities.Rol;
 import com.coworking.coworking_technical_test.entities.Usuario;
 import com.coworking.coworking_technical_test.exceptions.BusinessException;
+import com.coworking.coworking_technical_test.exceptions.MessageKey;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.UsuarioMapper;
 import com.coworking.coworking_technical_test.repositories.RolRepository;
@@ -30,24 +29,20 @@ public class UsuarioServiceImpl implements IUsuarioService {
     private final RolRepository rolRepository;
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
-    private final MessageSource messageSource;
 
     @Override
     public UsuarioDTO crearOperador(CrearOperadorRequest request) {
 
         if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new BusinessException(
-                    messageSource.getMessage("UsuarioEmailDuplicado", null, Locale.getDefault()));
+            throw new BusinessException(MessageKey.USUARIO_EMAIL_DUPLICADO);
         }
 
         if (usuarioRepository.existsByDocumento(request.getDocumento())) {
-            throw new BusinessException(
-                    messageSource.getMessage("UsuarioDocumentoDuplicado", null, Locale.getDefault()));
+            throw new BusinessException(MessageKey.USUARIO_DOCUMENTO_DUPLICADO);
         }
 
         Rol rolOperador = rolRepository.findByDescripcion("OPERADOR")
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("RolNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.ROL_NOT_FOUND));
 
         Usuario usuario = new Usuario();
         usuario.setNombre(request.getNombre());
@@ -64,8 +59,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public UsuarioDTO obtenerPorId(Integer id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("UsuarioNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
         return usuarioMapper.toDTO(usuario);
     }
 
@@ -79,18 +73,15 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public UsuarioDTO actualizar(Integer id, ActualizarUsuarioRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("UsuarioNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
 
         if (!usuario.getEmail().equals(request.getEmail()) && usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new BusinessException(
-                    messageSource.getMessage("UsuarioEmailDuplicado", null, Locale.getDefault()));
+            throw new BusinessException(MessageKey.USUARIO_EMAIL_DUPLICADO);
         }
 
         if (!usuario.getDocumento().equals(request.getDocumento())
                 && usuarioRepository.existsByDocumento(request.getDocumento())) {
-            throw new BusinessException(
-                    messageSource.getMessage("UsuarioDocumentoDuplicado", null, Locale.getDefault()));
+            throw new BusinessException(MessageKey.USUARIO_DOCUMENTO_DUPLICADO);
         }
 
         usuario.setNombre(request.getNombre());
@@ -105,8 +96,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public void eliminar(Integer id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("UsuarioNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
         usuarioRepository.delete(usuario);
     }
 

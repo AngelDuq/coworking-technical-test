@@ -13,6 +13,8 @@ import com.coworking.coworking_technical_test.entities.Cupon.EstadoCupon;
 import com.coworking.coworking_technical_test.entities.Persona;
 import com.coworking.coworking_technical_test.entities.Sede;
 import com.coworking.coworking_technical_test.exceptions.BusinessException;
+import com.coworking.coworking_technical_test.exceptions.MessageKey;
+import com.coworking.coworking_technical_test.exceptions.MessageResolver;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.CuponMapper;
 import com.coworking.coworking_technical_test.repositories.CuponRepository;
@@ -36,6 +38,7 @@ public class CuponServiceImpl implements ICuponService {
     private final CuponRepository cuponRepository;
     private final INotificacionService notificacionService;
     private final CuponMapper cuponMapper;
+    private final MessageResolver messageResolver;
 
     @Override
     public void verificarYGenerarCupon(Persona persona, Sede sede) {
@@ -66,10 +69,11 @@ public class CuponServiceImpl implements ICuponService {
         log.info("Cupon de fidelidad generado para persona {} en sede {}", persona.getDocumento(), sede.getNombre());
 
         // Enviar notificación simulada
-        String mensaje = String.format(
-                "Gracias por tu fidelidad! Has acumulado mas de %d horas en la sede %s. "
-                        + "Se te ha otorgado un cupon de consumo interno con vigencia hasta el %s.",
-                HORAS_MINIMAS_FIDELIDAD, sede.getNombre(), cupon.getFechaVencimiento());
+        String mensaje = messageResolver.get(
+            MessageKey.CUPON_FIDELIDAD_NOTIFICACION,
+            HORAS_MINIMAS_FIDELIDAD,
+            sede.getNombre(),
+            cupon.getFechaVencimiento());
 
         NotificacionRequest notificacion = NotificacionRequest.builder()
                 .email(persona.getEmail() != null ? persona.getEmail() : "sin-email@coworking.com")
@@ -106,10 +110,13 @@ public class CuponServiceImpl implements ICuponService {
     @Transactional
     public CuponRedencionResponse redimirCupon(Integer cuponId) {
         Cupon cupon = cuponRepository.findById(cuponId)
-                .orElseThrow(() -> new NotFoundException("Cupón no encontrado"));
+                .orElseThrow(() -> new NotFoundException(MessageKey.CUPON_NOT_FOUND));
 
         if (cupon.getEstado() != EstadoCupon.ACTIVO) {
-            throw new BusinessException("El cupón no está activo y no puede ser redimido");
+            if (cupon.getEstado() == EstadoCupon.EXPIRADO) {
+                throw new BusinessException(MessageKey.CUPON_EXPIRADO);
+            }
+            throw new BusinessException(MessageKey.CUPON_UTILIZADO);
         }
 
         EstadoCupon estadoAnterior = cupon.getEstado();
@@ -119,7 +126,10 @@ public class CuponServiceImpl implements ICuponService {
 
         log.info("Cupón con ID {} redimido exitosamente.", cuponId);
 
-        return cuponMapper.toRedencionResponse(cupon, estadoAnterior, "Cupón redimido exitosamente");
+        return cuponMapper.toRedencionResponse(
+            cupon,
+            estadoAnterior,
+            messageResolver.get(MessageKey.CUPON_REDIMIDO_EXITOSO));
     }
 
 }

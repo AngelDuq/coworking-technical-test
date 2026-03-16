@@ -4,15 +4,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Locale;
 
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.coworking.coworking_technical_test.entities.Historico;
 import com.coworking.coworking_technical_test.entities.Ingreso;
 import com.coworking.coworking_technical_test.entities.Persona;
+import com.coworking.coworking_technical_test.exceptions.MessageKey;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.HistoricoMapper;
 import com.coworking.coworking_technical_test.repositories.HistoricoRepository;
@@ -33,7 +32,6 @@ public class SalidaServiceImpl implements ISalidaService {
     private final HistoricoRepository historicoRepository;
     private final PersonaRepository personaRepository;
     private final HistoricoMapper historicoMapper;
-    private final MessageSource messageSource;
     private final ICuponService cuponService;
 
     @Override
@@ -42,13 +40,11 @@ public class SalidaServiceImpl implements ISalidaService {
 
         // Buscar persona por documento
         Persona persona = personaRepository.findByDocumento(request.getDocumento())
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("PersonaNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.PERSONA_NOT_FOUND));
 
         // Validar que exista ingreso activo
         Ingreso ingreso = ingresoRepository.findByPersona(persona)
-                .orElseThrow(() -> new NotFoundException(
-                        messageSource.getMessage("IngresoNotFound", null, Locale.getDefault())));
+            .orElseThrow(() -> new NotFoundException(MessageKey.INGRESO_NOT_FOUND));
 
         // Registrar fecha y hora de salida
         LocalDateTime fechaSalida = LocalDateTime.now();
