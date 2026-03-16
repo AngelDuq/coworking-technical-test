@@ -1,7 +1,6 @@
 package com.coworking.coworking_technical_test.controllers;
 
-import com.coworking.coworking_technical_test.security.JwtTokenProvider;
-import com.coworking.coworking_technical_test.services.interfaces.ITokenBlacklistService;
+import com.coworking.coworking_technical_test.services.interfaces.IAuthService;
 import com.coworking.coworking_technical_test.shared.request.LoginRequest;
 import com.coworking.coworking_technical_test.shared.responses.TokenResponse;
 import com.coworking.coworking_technical_test.shared.util.Constants;
@@ -13,11 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -30,31 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Autenticación", description = "Endpoint de inicio de sesión y obtención de token JWT")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final ITokenBlacklistService tokenBlacklistService;
+    private final IAuthService authService;
 
     @PostMapping("/login")
     @Operation(summary = "Iniciar sesión", description = "Autentica al usuario y retorna un token JWT")
     @ApiResponse(responseCode = "200", description = "Login exitoso, retorna token JWT y rol")
     @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String token = jwtTokenProvider.generateToken(authentication);
-
-        String rol = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .findFirst()
-                .orElse("ROLE_USER");
-
-        return ResponseEntity.ok(new TokenResponse(token, rol));
+        return ResponseEntity.ok(authService.login(loginRequest));
     }
 
     @PostMapping("/logout")
@@ -64,8 +41,7 @@ public class AuthController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> logout(
             @RequestHeader(Constants.HEADER_AUTHORIZATION_KEY) String authHeader) {
-        String token = authHeader.substring(Constants.TOKEN_BEARER_PREFIX.length()).trim();
-        tokenBlacklistService.blacklist(token);
+        authService.logout(authHeader);
         return ResponseEntity.noContent().build();
     }
 }

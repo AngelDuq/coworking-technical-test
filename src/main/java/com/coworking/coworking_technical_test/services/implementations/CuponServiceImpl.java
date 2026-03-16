@@ -97,4 +97,19 @@ public class CuponServiceImpl implements ICuponService {
         log.info("Se expiraron {} cupones vencidos.", cuponesVencidos.size());
     }
 
+    
+    public void redimirCupon(Integer cuponId) {
+        Cupon cupon = cuponRepository.findById(cuponId)
+                .orElseThrow(() -> new RuntimeException("Cupón no encontrado"));
+
+        if (cupon.getEstado() != EstadoCupon.ACTIVO) {
+            throw new RuntimeException("El cupón no está activo y no puede ser redimido");
+        }
+
+        cupon.setEstado(EstadoCupon.UTILIZADO);
+        cuponRepository.save(cupon);
+
+        log.info("Cupón con ID {} redimido exitosamente.", cuponId);
+    }
+
 }
