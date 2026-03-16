@@ -18,6 +18,7 @@ import com.coworking.coworking_technical_test.services.interfaces.IUsuarioServic
 import com.coworking.coworking_technical_test.shared.dto.UsuarioDTO;
 import com.coworking.coworking_technical_test.shared.request.ActualizarUsuarioRequest;
 import com.coworking.coworking_technical_test.shared.request.CrearOperadorRequest;
+import com.coworking.coworking_technical_test.shared.util.Constants;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +42,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
             throw new BusinessException(MessageKey.USUARIO_DOCUMENTO_DUPLICADO);
         }
 
-        Rol rolOperador = rolRepository.findByDescripcion("OPERADOR")
+        Rol rolOperador = rolRepository.findByDescripcion(Constants.ROL_OPERADOR)
             .orElseThrow(() -> new NotFoundException(MessageKey.ROL_NOT_FOUND));
 
         Usuario usuario = new Usuario();

@@ -16,6 +16,7 @@ import com.coworking.coworking_technical_test.repositories.UsuarioRepository;
 import com.coworking.coworking_technical_test.services.interfaces.ISedeService;
 import com.coworking.coworking_technical_test.shared.dto.SedeDTO;
 import com.coworking.coworking_technical_test.shared.request.SedeRequest;
+import com.coworking.coworking_technical_test.shared.util.Constants;
 
 import lombok.RequiredArgsConstructor;
 
@@ -74,7 +75,7 @@ public class SedeServiceImpl implements ISedeService {
             .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
 
         // Validar que el usuario tenga rol OPERADOR
-        if (operador.getRol() == null || !"OPERADOR".equalsIgnoreCase(operador.getRol().getDescripcion())) {
+        if (operador.getRol() == null || !Constants.ROL_OPERADOR.equalsIgnoreCase(operador.getRol().getDescripcion())) {
             throw new BusinessException(MessageKey.USUARIO_NO_ES_OPERADOR);
         }
 

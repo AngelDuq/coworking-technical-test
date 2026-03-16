@@ -16,4 +16,8 @@ public class Constants {
 
     public static final String TOKEN_BEARER_PREFIX = "Bearer ";
 
+    public static final String ROL_OPERADOR = "OPERADOR";
+
+    public static final String AUTHORITY_ROLE_USER = "ROLE_USER";
+
 }

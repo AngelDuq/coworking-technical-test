@@ -36,7 +36,7 @@ public class AuthServiceImpl implements IAuthService {
         String rol = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
-                .orElse("ROLE_USER");
+            .orElse(Constants.AUTHORITY_ROLE_USER);
 
         return new TokenResponse(token, rol);
     }
