@@ -21,7 +21,20 @@ public enum MessageKey {
     TOKEN_BLACKLISTED("TokenBlacklisted"),
     CUPON_REDIMIDO_EXITOSO("CuponRedimidoExitoso"),
     CUPON_FIDELIDAD_NOTIFICACION("CuponFidelidadNotificacion"),
-    NOTIFICACION_ENVIADA_EXITOSA("NotificacionEnviadaExitosa");
+    NOTIFICACION_ENVIADA_EXITOSA("NotificacionEnviadaExitosa"),
+    LOG_CUPON_FIDELIDAD_GENERADO("LogCuponFidelidadGenerado"),
+    LOG_CUPONES_VENCIDOS_NO_ENCONTRADOS("LogCuponesVencidosNoEncontrados"),
+    LOG_CUPONES_VENCIDOS_EXPIRADOS("LogCuponesVencidosExpirados"),
+    LOG_CUPON_REDIMIDO_EXITOSO("LogCuponRedimidoExitoso"),
+    LOG_CUPON_SCHEDULER_INICIO("LogCuponSchedulerInicio"),
+    LOG_CUPON_SCHEDULER_FIN("LogCuponSchedulerFin"),
+    LOG_NOTIFICACION_HEADER("LogNotificacionHeader"),
+    LOG_NOTIFICACION_EMAIL_DESTINO("LogNotificacionEmailDestino"),
+    LOG_NOTIFICACION_DOCUMENTO("LogNotificacionDocumento"),
+    LOG_NOTIFICACION_SEDE("LogNotificacionSede"),
+    LOG_NOTIFICACION_MENSAJE("LogNotificacionMensaje"),
+    LOG_NOTIFICACION_ESTADO("LogNotificacionEstado"),
+    LOG_NOTIFICACION_FOOTER("LogNotificacionFooter");
 
     private final String key;
 

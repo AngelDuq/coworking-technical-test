@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.coworking.coworking_technical_test.exceptions.MessageKey;
+import com.coworking.coworking_technical_test.exceptions.MessageResolver;
 import com.coworking.coworking_technical_test.services.interfaces.ICuponService;
 
 import lombok.RequiredArgsConstructor;
@@ -15,12 +17,13 @@ public class CuponScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(CuponScheduler.class);
     private final ICuponService cuponService;
+    private final MessageResolver messageResolver;
 
     @Scheduled(cron = "0 0 0 * * *")
     public void expirarCuponesVencidos() {
-        log.info("Iniciando tarea programada: verificacion de cupones vencidos.");
+        log.info(messageResolver.get(MessageKey.LOG_CUPON_SCHEDULER_INICIO));
         cuponService.expirarCuponesVencidos();
-        log.info("Tarea programada finalizada: verificacion de cupones vencidos.");
+        log.info(messageResolver.get(MessageKey.LOG_CUPON_SCHEDULER_FIN));
     }
 
 }

@@ -21,13 +21,13 @@ public class NotificacionServiceImpl implements INotificacionService {
 
     @Override
     public NotificacionResponse enviarNotificacion(NotificacionRequest request) {
-        log.info("========== MICROSERVICIO DE NOTIFICACIONES (SIMULADO) ==========");
-        log.info("Email destino : {}", request.getEmail());
-        log.info("Documento     : {}", request.getDocumento());
-        log.info("Sede          : {} (ID: {})", request.getSedeNombre(), request.getSedeId());
-        log.info("Mensaje       : {}", request.getMensaje());
-        log.info("Estado        : ENVIADO EXITOSAMENTE ");
-        log.info("=================================================================");
+        log.info(messageResolver.get(MessageKey.LOG_NOTIFICACION_HEADER));
+        log.info(messageResolver.get(MessageKey.LOG_NOTIFICACION_EMAIL_DESTINO, request.getEmail()));
+        log.info(messageResolver.get(MessageKey.LOG_NOTIFICACION_DOCUMENTO, request.getDocumento()));
+        log.info(messageResolver.get(MessageKey.LOG_NOTIFICACION_SEDE, request.getSedeNombre(), request.getSedeId()));
+        log.info(messageResolver.get(MessageKey.LOG_NOTIFICACION_MENSAJE, request.getMensaje()));
+        log.info(messageResolver.get(MessageKey.LOG_NOTIFICACION_ESTADO));
+        log.info(messageResolver.get(MessageKey.LOG_NOTIFICACION_FOOTER));
 
         return NotificacionResponse.builder()
                 .exitoso(true)

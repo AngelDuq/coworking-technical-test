@@ -9,18 +9,17 @@ import org.springframework.stereotype.Service;
 import com.coworking.coworking_technical_test.entities.Ingreso;
 import com.coworking.coworking_technical_test.entities.Persona;
 import com.coworking.coworking_technical_test.entities.Sede;
-import com.coworking.coworking_technical_test.entities.Usuario;
 import com.coworking.coworking_technical_test.exceptions.BusinessException;
 import com.coworking.coworking_technical_test.exceptions.MessageKey;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.IngresoMapper;
 import com.coworking.coworking_technical_test.repositories.IngresoRepository;
-import com.coworking.coworking_technical_test.repositories.PersonaRepository;
-import com.coworking.coworking_technical_test.repositories.SedeRepository;
-import com.coworking.coworking_technical_test.repositories.UsuarioRepository;
 import com.coworking.coworking_technical_test.services.interfaces.IIngresoService;
+import com.coworking.coworking_technical_test.services.interfaces.IPersonaService;
+import com.coworking.coworking_technical_test.services.interfaces.ISedeService;
 import com.coworking.coworking_technical_test.shared.dto.IngresoDTO;
 import com.coworking.coworking_technical_test.shared.request.IngresoRequest;
+import com.coworking.coworking_technical_test.shared.request.PersonaRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,33 +28,29 @@ import lombok.RequiredArgsConstructor;
 public class IngresoServiceImpl implements IIngresoService {
 
     private final IngresoRepository ingresoRepository;
-    private final PersonaRepository personaRepository;
-    private final SedeRepository sedeRepository;
-    private final UsuarioRepository usuarioRepository;
+        private final IPersonaService personaService;
+        private final ISedeService sedeService;
     private final IngresoMapper ingresoMapper;
 
     @Override
     public IngresoDTO registrarIngreso(IngresoRequest request) {
 
-        // Buscar o crear persona por documento
-        Persona persona = personaRepository.findByDocumento(request.getDocumento())
-                .orElseGet(() -> {
-                    Persona nueva = new Persona();
-                    nueva.setDocumento(request.getDocumento());
-                    nueva.setNombre(request.getNombre());
-                    nueva.setApellido(request.getApellido());
-                    nueva.setEmail(request.getEmail());
-                    return personaRepository.save(nueva);
-                });
+                PersonaRequest personaRequest = new PersonaRequest();
+                personaRequest.setDocumento(request.getDocumento());
+                personaRequest.setNombre(request.getNombre());
+                personaRequest.setApellido(request.getApellido());
+                personaRequest.setEmail(request.getEmail());
+
+                // Buscar o crear persona por documento
+                Persona persona = personaService.obtenerOCrearEntidadPorDocumento(personaRequest);
 
         // Validar que no exista ingreso activo del mismo documento en ninguna sede
-        if (ingresoRepository.existsByPersona(persona)) {
+                if (ingresoRepository.existsByPersona(persona)) {
                         throw new BusinessException(MessageKey.INGRESO_ACTIVO);
         }
 
         // Buscar sede
-        Sede sede = sedeRepository.findById(request.getSedeId())
-                .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
+                Sede sede = sedeService.obtenerEntidadPorId(request.getSedeId());
 
         // Validar capacidad disponible
         long ocupacionActual = ingresoRepository.countBySedeId(sede.getId());
@@ -82,15 +77,27 @@ public class IngresoServiceImpl implements IIngresoService {
 
     @Override
     public List<IngresoDTO> obtenerAccesosPorSede(String emailOperador) {
-        Usuario operador = usuarioRepository.findByEmail(emailOperador)
-                .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
-
-        Sede sede = sedeRepository.findByOperadorId(operador.getId())
-                .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
+                Sede sede = sedeService.obtenerEntidadPorEmailOperador(emailOperador);
 
         return ingresoRepository.findBySedeId(sede.getId()).stream()
                 .map(ingresoMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+        @Override
+        public Ingreso obtenerIngresoActivoPorPersona(Persona persona) {
+                return ingresoRepository.findByPersona(persona)
+                        .orElseThrow(() -> new NotFoundException(MessageKey.INGRESO_NOT_FOUND));
+        }
+
+        @Override
+        public void eliminarIngreso(Ingreso ingreso) {
+                ingresoRepository.delete(ingreso);
+        }
+
+        @Override
+        public List<Ingreso> obtenerPersonasPrimerIngreso() {
+                return ingresoRepository.findPersonasPrimerIngreso();
+        }
 
 }

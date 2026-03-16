@@ -72,4 +72,23 @@ public class PersonaServiceImpl implements IPersonaService {
         personaRepository.delete(persona);
     }
 
+    @Override
+    public Persona obtenerEntidadPorDocumento(String documento) {
+        return personaRepository.findByDocumento(documento)
+            .orElseThrow(() -> new NotFoundException(MessageKey.PERSONA_NOT_FOUND));
+    }
+
+    @Override
+    public Persona obtenerOCrearEntidadPorDocumento(PersonaRequest request) {
+        return personaRepository.findByDocumento(request.getDocumento())
+            .orElseGet(() -> {
+                Persona nueva = new Persona();
+                nueva.setDocumento(request.getDocumento());
+                nueva.setNombre(request.getNombre());
+                nueva.setApellido(request.getApellido());
+                nueva.setEmail(request.getEmail());
+                return personaRepository.save(nueva);
+            });
+    }
+
 }

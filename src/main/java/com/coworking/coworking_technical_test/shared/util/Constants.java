@@ -20,4 +20,6 @@ public class Constants {
 
     public static final String AUTHORITY_ROLE_USER = "ROLE_USER";
 
+    public static final String EMAIL_DEFAULT= "sin-email@coworking.com";
+
 }

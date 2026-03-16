@@ -2,6 +2,7 @@ package com.coworking.coworking_technical_test.services.interfaces;
 
 import java.util.List;
 
+import com.coworking.coworking_technical_test.entities.Persona;
 import com.coworking.coworking_technical_test.shared.dto.PersonaDTO;
 import com.coworking.coworking_technical_test.shared.request.PersonaRequest;
 
@@ -16,5 +17,9 @@ public interface IPersonaService {
     PersonaDTO actualizar(Integer id, PersonaRequest request);
 
     void eliminar(Integer id);
+
+    Persona obtenerEntidadPorDocumento(String documento);
+
+    Persona obtenerOCrearEntidadPorDocumento(PersonaRequest request);
 
 }

@@ -12,8 +12,8 @@ import com.coworking.coworking_technical_test.exceptions.BusinessException;
 import com.coworking.coworking_technical_test.exceptions.MessageKey;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.UsuarioMapper;
-import com.coworking.coworking_technical_test.repositories.RolRepository;
 import com.coworking.coworking_technical_test.repositories.UsuarioRepository;
+import com.coworking.coworking_technical_test.services.interfaces.IRolService;
 import com.coworking.coworking_technical_test.services.interfaces.IUsuarioService;
 import com.coworking.coworking_technical_test.shared.dto.UsuarioDTO;
 import com.coworking.coworking_technical_test.shared.request.ActualizarUsuarioRequest;
@@ -27,9 +27,10 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioServiceImpl implements IUsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;
+    private final IRolService rolService;
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
+    
 
     @Override
     public UsuarioDTO crearOperador(CrearOperadorRequest request) {
@@ -42,8 +43,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
             throw new BusinessException(MessageKey.USUARIO_DOCUMENTO_DUPLICADO);
         }
 
-        Rol rolOperador = rolRepository.findByDescripcion(Constants.ROL_OPERADOR)
-            .orElseThrow(() -> new NotFoundException(MessageKey.ROL_NOT_FOUND));
+        Rol rolOperador = rolService.obtenerPorDescripcion(Constants.ROL_OPERADOR);
 
         Usuario usuario = new Usuario();
         usuario.setNombre(request.getNombre());
@@ -99,6 +99,24 @@ public class UsuarioServiceImpl implements IUsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
         usuarioRepository.delete(usuario);
+    }
+
+    @Override
+    public Usuario obtenerEntidadPorId(Integer id) {
+        return usuarioRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
+    }
+
+    @Override
+    public Usuario obtenerEntidadPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
+    }
+
+    @Override
+    public boolean esOperador(Usuario usuario) {
+        return usuario.getRol() != null
+            && Constants.ROL_OPERADOR.equalsIgnoreCase(usuario.getRol().getDescripcion());
     }
 
 }

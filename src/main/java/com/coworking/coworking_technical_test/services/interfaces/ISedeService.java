@@ -2,6 +2,7 @@ package com.coworking.coworking_technical_test.services.interfaces;
 
 import java.util.List;
 
+import com.coworking.coworking_technical_test.entities.Sede;
 import com.coworking.coworking_technical_test.shared.dto.SedeDTO;
 import com.coworking.coworking_technical_test.shared.request.SedeRequest;
 
@@ -18,5 +19,9 @@ public interface ISedeService {
     void eliminar(Integer id);
 
     SedeDTO asignarOperador(Integer sedeId, Integer operadorId);
+
+    Sede obtenerEntidadPorId(Integer id);
+
+    Sede obtenerEntidadPorEmailOperador(String emailOperador);
 
 }

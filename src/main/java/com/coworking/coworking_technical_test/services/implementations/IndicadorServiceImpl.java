@@ -14,14 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.coworking.coworking_technical_test.entities.Ingreso;
 import com.coworking.coworking_technical_test.entities.Sede;
-import com.coworking.coworking_technical_test.entities.Usuario;
-import com.coworking.coworking_technical_test.exceptions.MessageKey;
-import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.repositories.HistoricoRepository;
-import com.coworking.coworking_technical_test.repositories.IngresoRepository;
-import com.coworking.coworking_technical_test.repositories.SedeRepository;
-import com.coworking.coworking_technical_test.repositories.UsuarioRepository;
 import com.coworking.coworking_technical_test.services.interfaces.IIndicadorService;
+import com.coworking.coworking_technical_test.services.interfaces.IIngresoService;
+import com.coworking.coworking_technical_test.services.interfaces.ISedeService;
 import com.coworking.coworking_technical_test.shared.dto.IngresoEconomicoDTO;
 import com.coworking.coworking_technical_test.shared.dto.PersonaPrimerIngresoDTO;
 import com.coworking.coworking_technical_test.shared.dto.TopOperadorDTO;
@@ -35,9 +31,8 @@ import lombok.RequiredArgsConstructor;
 public class IndicadorServiceImpl implements IIndicadorService {
 
         private final HistoricoRepository historicoRepository;
-        private final IngresoRepository ingresoRepository;
-        private final UsuarioRepository usuarioRepository;
-        private final SedeRepository sedeRepository;
+        private final IIngresoService ingresoService;
+        private final ISedeService sedeService;
 
         @Override
         public List<TopPersonaDTO> topPersonasConMasIngresos() {
@@ -50,8 +45,7 @@ public class IndicadorServiceImpl implements IIndicadorService {
         @Override
         public List<TopPersonaDTO> topPersonasConMasIngresosPorSede(Integer sedeId) {
                 // Validar que la sede exista
-                sedeRepository.findById(sedeId)
-                                .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
+                sedeService.obtenerEntidadPorId(sedeId);
 
                 List<Object[]> resultados = historicoRepository
                                 .findTopPersonasConMasIngresosPorSede(sedeId, PageRequest.of(0, 10));
@@ -62,7 +56,7 @@ public class IndicadorServiceImpl implements IIndicadorService {
 
         @Override
         public List<PersonaPrimerIngresoDTO> personasPrimerIngreso() {
-                List<Ingreso> ingresos = ingresoRepository.findPersonasPrimerIngreso();
+                List<Ingreso> ingresos = ingresoService.obtenerPersonasPrimerIngreso();
                 return ingresos.stream()
                                 .map(i -> {
                                         PersonaPrimerIngresoDTO dto = new PersonaPrimerIngresoDTO();
@@ -78,13 +72,7 @@ public class IndicadorServiceImpl implements IIndicadorService {
 
         @Override
         public IngresoEconomicoDTO ingresosEconomicos(String emailOperador) {
-                // Buscar usuario operador
-                Usuario operador = usuarioRepository.findByEmail(emailOperador)
-                                .orElseThrow(() -> new NotFoundException(MessageKey.USUARIO_NOT_FOUND));
-
-                // Buscar sede asignada al operador
-                Sede sede = sedeRepository.findByOperadorId(operador.getId())
-                                .orElseThrow(() -> new NotFoundException(MessageKey.SEDE_NOT_FOUND));
+                Sede sede = sedeService.obtenerEntidadPorEmailOperador(emailOperador);
 
                 LocalDate hoy = LocalDate.now();
 

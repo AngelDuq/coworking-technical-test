@@ -11,13 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.coworking.coworking_technical_test.entities.Historico;
 import com.coworking.coworking_technical_test.entities.Ingreso;
 import com.coworking.coworking_technical_test.entities.Persona;
-import com.coworking.coworking_technical_test.exceptions.MessageKey;
-import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.HistoricoMapper;
 import com.coworking.coworking_technical_test.repositories.HistoricoRepository;
-import com.coworking.coworking_technical_test.repositories.IngresoRepository;
-import com.coworking.coworking_technical_test.repositories.PersonaRepository;
 import com.coworking.coworking_technical_test.services.interfaces.ICuponService;
+import com.coworking.coworking_technical_test.services.interfaces.IIngresoService;
+import com.coworking.coworking_technical_test.services.interfaces.IPersonaService;
 import com.coworking.coworking_technical_test.services.interfaces.ISalidaService;
 import com.coworking.coworking_technical_test.shared.dto.HistoricoDTO;
 import com.coworking.coworking_technical_test.shared.request.SalidaRequest;
@@ -28,9 +26,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SalidaServiceImpl implements ISalidaService {
 
-    private final IngresoRepository ingresoRepository;
     private final HistoricoRepository historicoRepository;
-    private final PersonaRepository personaRepository;
+    private final IIngresoService ingresoService;
+    private final IPersonaService personaService;
     private final HistoricoMapper historicoMapper;
     private final ICuponService cuponService;
 
@@ -39,12 +37,10 @@ public class SalidaServiceImpl implements ISalidaService {
     public HistoricoDTO registrarSalida(SalidaRequest request) {
 
         // Buscar persona por documento
-        Persona persona = personaRepository.findByDocumento(request.getDocumento())
-            .orElseThrow(() -> new NotFoundException(MessageKey.PERSONA_NOT_FOUND));
+        Persona persona = personaService.obtenerEntidadPorDocumento(request.getDocumento());
 
         // Validar que exista ingreso activo
-        Ingreso ingreso = ingresoRepository.findByPersona(persona)
-            .orElseThrow(() -> new NotFoundException(MessageKey.INGRESO_NOT_FOUND));
+        Ingreso ingreso = ingresoService.obtenerIngresoActivoPorPersona(persona);
 
         // Registrar fecha y hora de salida
         LocalDateTime fechaSalida = LocalDateTime.now();
@@ -73,7 +69,7 @@ public class SalidaServiceImpl implements ISalidaService {
         Historico saved = historicoRepository.save(historico);
 
         // Eliminar el registro de ingreso (liberar cupo en la sede)
-        ingresoRepository.delete(ingreso);
+        ingresoService.eliminarIngreso(ingreso);
 
         // Verificar fidelidad y generar cupón si aplica (+20 horas en la misma sede)
         cuponService.verificarYGenerarCupon(persona, ingreso.getSede());

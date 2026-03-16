@@ -18,11 +18,12 @@ import com.coworking.coworking_technical_test.exceptions.MessageResolver;
 import com.coworking.coworking_technical_test.exceptions.NotFoundException;
 import com.coworking.coworking_technical_test.mappers.CuponMapper;
 import com.coworking.coworking_technical_test.repositories.CuponRepository;
-import com.coworking.coworking_technical_test.repositories.HistoricoRepository;
 import com.coworking.coworking_technical_test.services.interfaces.ICuponService;
+import com.coworking.coworking_technical_test.services.interfaces.IHistoricoService;
 import com.coworking.coworking_technical_test.services.interfaces.INotificacionService;
 import com.coworking.coworking_technical_test.shared.request.NotificacionRequest;
 import com.coworking.coworking_technical_test.shared.responses.CuponRedencionResponse;
+import com.coworking.coworking_technical_test.shared.util.Constants;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +35,8 @@ public class CuponServiceImpl implements ICuponService {
     private static final long HORAS_MINIMAS_FIDELIDAD = 20;
     private static final int DIAS_VIGENCIA_CUPON = 10;
 
-    private final HistoricoRepository historicoRepository;
     private final CuponRepository cuponRepository;
+    private final IHistoricoService historicoService;
     private final INotificacionService notificacionService;
     private final CuponMapper cuponMapper;
     private final MessageResolver messageResolver;
@@ -48,8 +49,8 @@ public class CuponServiceImpl implements ICuponService {
         }
 
         // Sumar minutos acumulados en esta sede
-        Long minutosTotales = historicoRepository
-                .sumarMinutosPermanenciaPorPersonaYSede(persona.getId(), sede.getId());
+        long minutosTotales = historicoService
+            .obtenerMinutosPermanenciaPorPersonaYSede(persona.getId(), sede.getId());
         long horasAcumuladas = minutosTotales / 60;
 
         if (horasAcumuladas < HORAS_MINIMAS_FIDELIDAD) {
@@ -66,7 +67,10 @@ public class CuponServiceImpl implements ICuponService {
         cupon.setEstado(EstadoCupon.ACTIVO);
         cuponRepository.save(cupon);
 
-        log.info("Cupon de fidelidad generado para persona {} en sede {}", persona.getDocumento(), sede.getNombre());
+        log.info(messageResolver.get(
+            MessageKey.LOG_CUPON_FIDELIDAD_GENERADO,
+            persona.getDocumento(),
+            sede.getNombre()));
 
         // Enviar notificación simulada
         String mensaje = messageResolver.get(
@@ -76,7 +80,7 @@ public class CuponServiceImpl implements ICuponService {
             cupon.getFechaVencimiento());
 
         NotificacionRequest notificacion = NotificacionRequest.builder()
-                .email(persona.getEmail() != null ? persona.getEmail() : "sin-email@coworking.com")
+                .email(persona.getEmail() != null ? persona.getEmail() : Constants.EMAIL_DEFAULT)
                 .documento(persona.getDocumento())
                 .mensaje(mensaje)
                 .sedeId(sede.getId())
@@ -94,7 +98,7 @@ public class CuponServiceImpl implements ICuponService {
                 .findByEstadoAndFechaVencimientoBefore(EstadoCupon.ACTIVO, hoy);
 
         if (cuponesVencidos.isEmpty()) {
-            log.info("No se encontraron cupones activos vencidos para expirar.");
+            log.info(messageResolver.get(MessageKey.LOG_CUPONES_VENCIDOS_NO_ENCONTRADOS));
             return;
         }
 
@@ -103,7 +107,7 @@ public class CuponServiceImpl implements ICuponService {
         }
         cuponRepository.saveAll(cuponesVencidos);
 
-        log.info("Se expiraron {} cupones vencidos.", cuponesVencidos.size());
+        log.info(messageResolver.get(MessageKey.LOG_CUPONES_VENCIDOS_EXPIRADOS, cuponesVencidos.size()));
     }
 
     @Override
@@ -124,7 +128,7 @@ public class CuponServiceImpl implements ICuponService {
         cupon.setFechaUso(LocalDate.now());
         cuponRepository.save(cupon);
 
-        log.info("Cupón con ID {} redimido exitosamente.", cuponId);
+        log.info(messageResolver.get(MessageKey.LOG_CUPON_REDIMIDO_EXITOSO, cuponId));
 
         return cuponMapper.toRedencionResponse(
             cupon,
