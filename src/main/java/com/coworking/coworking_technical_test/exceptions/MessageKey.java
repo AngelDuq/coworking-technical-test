@@ -34,7 +34,11 @@ public enum MessageKey {
     LOG_NOTIFICACION_SEDE("LogNotificacionSede"),
     LOG_NOTIFICACION_MENSAJE("LogNotificacionMensaje"),
     LOG_NOTIFICACION_ESTADO("LogNotificacionEstado"),
-    LOG_NOTIFICACION_FOOTER("LogNotificacionFooter");
+    LOG_NOTIFICACION_FOOTER("LogNotificacionFooter"),
+    NOTIFICACION_ENDPOINT_PATH("NotificacionEndpointPath"),
+    NOTIFICACION_RESPUESTA_INVALIDA("NotificacionRespuestaInvalida"),
+    NOTIFICACION_ENVIO_FALLIDO("NotificacionEnvioFallido"),
+    LOG_NOTIFICACION_ERROR_CONSUMO("LogNotificacionErrorConsumo");
 
     private final String key;
 
