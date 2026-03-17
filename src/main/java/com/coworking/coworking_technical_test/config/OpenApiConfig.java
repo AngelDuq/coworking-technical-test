@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Coworking API", version = "1.0", description = "API REST para la gestión de espacios de coworking. "
         + "Incluye autenticación JWT, gestión de sedes, registro de ingresos/salidas, "
-        + "indicadores y notificaciones."))
+        + "e indicadores."))
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
 public class OpenApiConfig {
 }
